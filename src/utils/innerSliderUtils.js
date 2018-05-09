@@ -320,6 +320,7 @@ export const swipeMove = (e, spec) => {
   // spec also contains, trackRef and slideIndex
   const {
     scrolling,
+    swiping2,
     animating,
     vertical,
     swipeToSlide,
@@ -340,6 +341,30 @@ export const swipeMove = (e, spec) => {
     listWidth
   } = spec;
   if (scrolling) return;
+
+
+  // modify here
+  if (!verticalSwiping && swiping2) {
+    window.ontouchmove = hideScroll
+    // document.addEventListener(
+    //   'touchmove',
+    //   function(e) {
+    //     e.preventDefault()
+    //   },
+    //   { passive: false }
+    // )
+  } else {
+    window.ontouchmove = null
+    // document.removeEventListener(
+    //   'touchmove',
+    //   function(e) {
+    //     e.preventDefault()
+    //   },
+    //   { passive: false }
+    // )
+  }
+
+
   if (animating) return e.preventDefault();
   if (vertical && swipeToSlide && verticalSwiping) e.preventDefault();
   let swipeLeft,
@@ -353,8 +378,9 @@ export const swipeMove = (e, spec) => {
   let verticalSwipeLength = Math.round(
     Math.sqrt(Math.pow(touchObject.curY - touchObject.startY, 2))
   );
-  if (!verticalSwiping && !swiping && verticalSwipeLength > 10) {
-    return { scrolling: true };
+  // modify here
+  if (!swiping2 && !verticalSwiping && !swiping && verticalSwipeLength > 10) {
+    return { scrolling: true, swiping2: false };
   }
   if (verticalSwiping) touchObject.swipeLength = verticalSwipeLength;
   let positionOffset =
@@ -401,6 +427,21 @@ export const swipeMove = (e, spec) => {
     swipeLeft,
     trackStyle: getTrackCSS({ ...spec, left: swipeLeft })
   };
+
+
+  //modify here
+  if (
+    !verticalSwiping &&
+    Math.abs(touchObject.curX - touchObject.startX) > 10
+  ) {
+    state['swiping2'] = true
+    console.warn('CALC true')
+  } else {
+    state['swiping2'] = false
+    console.warn('CALC false')
+  }
+
+
   if (
     Math.abs(touchObject.curX - touchObject.startX) <
     Math.abs(touchObject.curY - touchObject.startY) * 0.8
@@ -445,6 +486,14 @@ export const swipeEnd = (e, spec) => {
     swipeLeft: null,
     touchObject: {}
   };
+
+
+
+  //modify here
+  console.warn('swipeEnd*****************')
+  window.ontouchmove = hideScroll
+
+
   if (scrolling) {
     return state;
   }
