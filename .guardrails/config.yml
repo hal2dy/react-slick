@@ -1,5 +1,5 @@
 bundles: "auto"
 report:
   pullRequest:
-    findings: "onAllFiles"
+    findings: "onAllFiles" 
     comment: true
